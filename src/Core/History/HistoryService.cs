@@ -4,16 +4,20 @@ namespace SeBashProject.src.Core.History;
 
 internal class HistoryService {
     // -------------------- INITIALIZATION --------------------
+    private readonly HistoryConfig _config;
     private readonly List<string> _lines = [];
     private int _lastAppendedIndex = 0;
     public int TotalLines => _lines.Count;
-    public string? ExternalFilePath { get; }
 
-    public HistoryService(string? extFilePath) => ExternalFilePath = extFilePath;
+    public HistoryService(HistoryConfig config) => _config = config;
 
     // -------------------- METHODS --------------------
-    public void MarkLoadedAsAppended() => _lastAppendedIndex = _lines.Count;
-    public void AddLine(string line) => _lines.Add(line);
+    public void AddLine(string line) {
+        if (_lines.Any(ln => ln == line) && !_config.SaveDuplicates) return;
+        if (_config.Excludes.Any(ex => line.StartsWith(ex))) return;
+
+        _lines.Add(line);
+    }
     public IReadOnlyList<string> GetLines() => _lines;
     public IReadOnlyList<string> GetLastNLines(int n) {
         if (n > _lines.Count) n = _lines.Count;
@@ -65,21 +69,23 @@ internal class HistoryService {
     }
 
     public void LoadFromExtfile(){
-        if (string.IsNullOrWhiteSpace(ExternalFilePath)) return;
-
         try {
-            using (var sr = new StreamReader(ExternalFilePath)) {
+            if (string.IsNullOrWhiteSpace(_config.FilePath)) return;
+
+            using (var sr = new StreamReader(_config.FilePath)) {
                 string? line;
                 while ((line = sr.ReadLine()) != null) _lines.Add(line);
             }
         }
         catch (FileNotFoundException) { }            
         catch (IOException) { }            
+
+        finally { _lastAppendedIndex = _lines.Count; }
     }
 
     public void SaveToExtfile() {
-        if (string.IsNullOrWhiteSpace(ExternalFilePath)) return;
+        if (string.IsNullOrWhiteSpace(_config.FilePath)) return;
 
-        AppendNewLinesToFiles( [ExternalFilePath] );         
+        AppendNewLinesToFiles( [_config.FilePath] );         
     }
 }

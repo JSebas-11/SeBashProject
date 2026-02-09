@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SeBashProject.src.Common.Enums;
 using SeBashProject.src.Core.Execution;
 using SeBashProject.src.Core.History;
@@ -6,7 +7,6 @@ using SeBashProject.src.Core.InputReader;
 using SeBashProject.src.Core.Interpretation;
 using SeBashProject.src.Core.Parsing;
 using SeBashProject.src.Utilities;
-using SeBashProject.src.Utilities.Os;
 
 class Program {
     static void Main() {
@@ -18,7 +18,6 @@ class Program {
         string? input;
 
         historyService.LoadFromExtfile();
-        historyService.MarkLoadedAsAppended();
 
         while (true) {
             input = reader.ReadLine();
@@ -43,11 +42,25 @@ class Program {
     static ServiceProvider DefineDependencies() {
         var provider = new ServiceCollection();
 
+        // CONFIGURATION
+        var config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", false, true)
+            .Build();
+
+        var historyConf = config.GetSection("HistoryConfig").Get<HistoryConfig>()!;
+        // Add full path of history file
+        historyConf.FilePath = string.IsNullOrWhiteSpace(historyConf.FilePath) 
+            ? null : Path.Combine(Directory.GetCurrentDirectory(), historyConf.FilePath);
+
         // FACTORY
         provider.AddSingleton<CommandFactory>();
+
         // HISTORY
-        provider.AddSingleton(hs => { return new HistoryService(OsInteraction.GetHistFilePath()); });
+        provider.AddSingleton(historyConf);
+        provider.AddSingleton<HistoryService>();
         provider.AddSingleton<HistoryNavigator>();
+
         // TEXTREADER
         provider.AddSingleton<IInputReader, BasicInputReader>();
 
