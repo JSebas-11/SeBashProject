@@ -62,7 +62,7 @@ class Program {
         provider.AddSingleton<HistoryNavigator>();
 
         // TEXTREADER
-        provider.AddSingleton<IInputReader, BasicInputReader>();
+        provider.AddSingleton<IInputReader, InteractiveInputReader>();
 
         return provider.BuildServiceProvider();
     }

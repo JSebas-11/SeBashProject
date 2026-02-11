@@ -123,7 +123,8 @@ internal class InteractiveInputReader : IInputReader {
 
             case ConsoleKey.Backspace: RemoveLastCharBuffer(); break;
             case ConsoleKey.Tab: HandleTab(); break;
-            case ConsoleKey.UpArrow: case ConsoleKey.DownArrow: 
+            case ConsoleKey.UpArrow: 
+            case ConsoleKey.DownArrow: 
                 HandleHistory(key.Key == ConsoleKey.DownArrow);
                 break;
             case ConsoleKey.LeftArrow: break;
@@ -176,7 +177,7 @@ internal class InteractiveInputReader : IInputReader {
         string? newBuffer = next 
             ? _historyNavigator.GetNext() : _historyNavigator.GetPrevious();
 
-        if (string.IsNullOrWhiteSpace(newBuffer)) return;
+        if (newBuffer is null) return;
 
         ReplaceBuffer(newBuffer);
     }

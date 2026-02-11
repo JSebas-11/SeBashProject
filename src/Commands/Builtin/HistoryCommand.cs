@@ -19,6 +19,14 @@ internal sealed class HistoryCommand : Command {
             }
             
             string arg = Args[0];
+            if (arg == "-c") { // CLEAR HISTORY
+                // only -c parameter without specific words
+                if (Args.Count == 1) _historyService.ClearHistory();
+                else _historyService.ClearHistory(Args[1..]);
+                
+                return CmdResult.Ok;    
+            }
+
             if (arg == "-r") { // APPEND HISTORY FROM FILE
                 _historyService.AppendFromFiles(Args[1..]);
                 return CmdResult.Ok;    

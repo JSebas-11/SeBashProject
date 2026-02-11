@@ -88,4 +88,37 @@ internal class HistoryService {
 
         AppendNewLinesToFiles( [_config.FilePath] );         
     }
+
+    public void ClearHistory() {
+        _lines.Clear();
+        _lastAppendedIndex = 0;
+
+        if (string.IsNullOrWhiteSpace(_config.FilePath)) return;
+
+        try {
+            using (var fs = new FileStream(_config.FilePath, FileMode.Open, FileAccess.Write)) {
+                fs.SetLength(0);    
+            }
+        }
+        catch (FileNotFoundException) { }            
+        catch (IOException) { }  
+    }
+    public void ClearHistory(List<string> toRemove) {
+        _lines.RemoveAll(
+            line => toRemove.Any(prefix => line.StartsWith(prefix))
+        );
+        _lastAppendedIndex = _lines.Count;
+
+        if (string.IsNullOrWhiteSpace(_config.FilePath)) return;
+
+        try {
+            using (var sw = new StreamWriter(_config.FilePath, false)) {
+                foreach (string line in _lines) {
+                    sw.WriteLine(line);
+                }
+            }
+        }
+        catch (FileNotFoundException) { }            
+        catch (IOException) { }  
+    }
 }
