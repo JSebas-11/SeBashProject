@@ -2,7 +2,7 @@ namespace SeBashProject.src.Common;
 
 internal static class ShellMetadata {
     public static List<string> Builtins { get; } = [
-        "echo", "exit", "type", "pwd", "cd", "history"
+        "echo", "exit", "type", "pwd", "cd", "history", "tian"
     ];
 
     public static bool IsBuiltin(string command)

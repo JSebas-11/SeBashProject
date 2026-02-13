@@ -60,4 +60,11 @@ public static class OsInteraction {
         }
         catch (Exception) { return false; }
     }
+    
+    public static async Task<string?> ContentFileAsync(string path) {
+        if (!PathHandler.ExistsFile(path)) return null;
+
+        try { return await File.ReadAllTextAsync(path); }
+        catch (IOException) { return null; }
+    }
 }

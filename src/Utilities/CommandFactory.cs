@@ -2,6 +2,7 @@ using SeBashProject.src.Commands;
 using SeBashProject.src.Commands.Builtin;
 using SeBashProject.src.Common;
 using SeBashProject.src.Core.History;
+using SeBashProject.src.External.Abstraction;
 using SeBashProject.src.Models;
 using SeBashProject.src.Models.Execution;
 using SeBashProject.src.Utilities.Os;
@@ -11,9 +12,12 @@ namespace SeBashProject.src.Utilities;
 internal class CommandFactory {
     // ----------------------- INIT -----------------------
     private readonly HistoryService _historyService;
+    private readonly IGenerativeService _genService;
 
-    public CommandFactory(HistoryService historyService) 
-        => _historyService = historyService;
+    public CommandFactory(HistoryService historyService, IGenerativeService generativeService) {
+        _historyService = historyService;
+        _genService = generativeService;
+    }
 
 
     // ----------------------- METHODS -----------------------
@@ -34,6 +38,7 @@ internal class CommandFactory {
                 "cd" => new CdCommand(args),
                 "pwd" => new PwdCommand(),
                 "history" => new HistoryCommand(_historyService, args),
+                "tian" => new TianCommand(_genService, _historyService, args),
                 _ => new Command(instruction, args)
             };
         }
