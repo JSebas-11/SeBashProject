@@ -14,7 +14,7 @@ internal class PipelineExecutor {
 
     // -------------------- METHODS --------------------
     public async Task<CmdResult> ExecuteAsync() {
-        var readers = new System.IO.TextReader[CommandsCount];
+        var readers = new TextReader[CommandsCount];
         var writers = new TextWriter[CommandsCount];
 
         TextWriter? redStdout = null;

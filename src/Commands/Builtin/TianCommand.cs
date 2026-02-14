@@ -19,8 +19,8 @@ internal sealed class TianCommand : Command {
       -e,  --explain       Explain a given command.
       -ef, --exp-file      Explain the content of an external file.
       -g,  --generate      Generate a command based on your prompt.
-      -s,  --summarize     Summarize a file (errors, causes, highlights).
-      -h,  --history       Generate suggestions using your history and prompt.
+      -s,  --summarize     Summarize a file (errors, causes, highlights or its content itself).
+      -h,  --history       Generate suggestion using your history (max. last 80 commands) and prompt.
 
     Examples:
       tian -e ""chmod 755 file""
@@ -28,6 +28,7 @@ internal sealed class TianCommand : Command {
       tian -g ""zip all images except png""
       tian -s logs/app.log
       tian -h ""last docker commands I used""";
+      
     public TianCommand(IGenerativeService generativeService, HistoryService historyService, List<string> args) 
         : base("tian", args) 
     {
@@ -76,5 +77,5 @@ internal sealed class TianCommand : Command {
     private async Task<string> HandleHistoryAsync(string prompt)
         => _historyService.TotalLines == 0 
             ? "bash: tian: not context, history is empty"
-            : await _genService.HistoryBasedAsync(_historyService.GetLines(), prompt);
+            : await _genService.HistoryBasedAsync(_historyService.GetLastNLines(80), prompt);
 }
