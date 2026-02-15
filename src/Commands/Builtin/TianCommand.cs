@@ -10,7 +10,7 @@ internal sealed class TianCommand : Command {
     // --------------------- INIT ---------------------
     private readonly IGenerativeService _genService;
     private readonly HistoryService _historyService;
-    private readonly string Documentation = @"
+    private readonly string _documentation = @"
     Usage: tian [OPTION] ""prompt""
 
     An AI assistant to help you with command-line tasks.
@@ -41,7 +41,7 @@ internal sealed class TianCommand : Command {
         try {
             string output = null!; 
             if (Args.Count == 0) // No parameters/args specified
-                output = Documentation;
+                output = _documentation;
             else if (Args.Count == 1)
                 output = $"bash: tian: {Args[0]} requires an argument";
             else if (Args.Count > 2)

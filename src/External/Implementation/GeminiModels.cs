@@ -3,11 +3,9 @@ using System.Text.Json.Serialization;
 namespace SeBashProject.src.External.Implementation;
 
 // --------------------- COMMON ---------------------
-internal class Content(Part[] parts, string role = "model") {
+internal class Content(Part[] parts) {
     [JsonPropertyName("parts")]
     public Part[] Parts { get; init; } = parts;
-    [JsonPropertyName("role")]
-    public string Role { get; init; } = role;
 }
 
 internal class Part(string text) {

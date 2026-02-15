@@ -7,6 +7,27 @@ namespace SeBashProject.src.Commands.Builtin;
 internal sealed class HistoryCommand : Command {
     // --------------------- INIT ---------------------
     private readonly HistoryService _historyService;
+    private readonly string _documentation = @"
+    Usage: history [OPTION]
+
+    Display or manipulate the command history list.
+
+    Options:
+      none                    Display the entire history list.
+      <number>                Display the last <number> entries of the history list.
+      -h                      Show this help documentation.
+      -c                      Clear all entries from the history list.
+      -c <cmd>                Remove all occurrences of the specified command from the history list.
+      -r [filePath]           Read history entries from the file and append them to the current history list.
+      -w [filePath]           Write the current history list to the specified file.
+      -a [filePath]           Append history entries from this session to the specified file.
+
+    Examples:
+      history 20
+      history -c docker
+      history -r ~/.history
+      history -w backup.txt";
+
     public HistoryCommand(HistoryService historyService, List<string> args) : base("history", args)
         => _historyService = historyService;
 
@@ -19,6 +40,11 @@ internal sealed class HistoryCommand : Command {
             }
             
             string arg = Args[0];
+            if (arg == "-h") {
+                await stdout.WriteLineAsync(_documentation);
+                return CmdResult.Ok;    
+            }
+            
             if (arg == "-c") { // CLEAR HISTORY
                 // only -c parameter without specific words
                 if (Args.Count == 1) _historyService.ClearHistory();

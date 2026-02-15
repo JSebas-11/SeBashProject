@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SeBashProject.src.External.Abstraction;
 using SeBashProject.src.External.Config;
@@ -21,11 +22,9 @@ internal class GeminiService : IGenerativeService {
 
     // --------------------- METHODS ---------------------
     public Task<string> ExplainCommandAsync(string command)
-        => LookUpGeminiAsync($@"
-        Explain the following Linux command clearly and accurately:
+        => LookUpGeminiAsync($@"Explain the following Linux command clearly and accurately:
 
-        COMMAND:
-        {command}
+        COMMAND: {command}
 
         GUIDELINES:
         - Break it down by parts (flags, arguments, subcommands).
@@ -35,8 +34,7 @@ internal class GeminiService : IGenerativeService {
         - If the command is ambiguous, list possible interpretations.", "ExplainCommandAsync");
 
     public Task<string> ExplainFileAsync(string content)
-        => LookUpGeminiAsync($@"
-        Explain the following file or code content:
+        => LookUpGeminiAsync($@"Explain the following file or code content:
 
         CONTENT:
         {content}
@@ -48,19 +46,16 @@ internal class GeminiService : IGenerativeService {
         - Describe any dependencies or assumptions.", "ExplainFileAsync");
 
     public Task<string> GenerateCommandAsync(string prompt)
-        => LookUpGeminiAsync($@"
-        Based on the following request, generate ONE safe Linux shell command:
+        => LookUpGeminiAsync($@"Based on the following request, generate ONE safe Linux shell command on only one line:
 
-        REQUEST:
-        {prompt}
+        REQUEST: {prompt}
 
         RULES:
         - The command must be non-destructive (no rm -rf, wipefs, mkfs, dd to disks, etc.).
         - Prefer read-only or harmless commands unless explicitly stated.", "GenerateCommandAsync");
 
     public Task<string> SummarizeAsync(string content)
-        => LookUpGeminiAsync($@"
-        Provide a clear and concise summary of the following text:
+        => LookUpGeminiAsync($@"Provide a clear and concise summary of the following text:
         
         TEXT:
         {content}
@@ -72,11 +67,9 @@ internal class GeminiService : IGenerativeService {
         - Make the summary neutral and objective.", "SummarizeAsync");
     
     public Task<string> HistoryBasedAsync(IEnumerable<string> history, string prompt) 
-        => LookUpGeminiAsync($@"
-        Based on the following Bash history and the new request, generate a helpful suggestion:
+        => LookUpGeminiAsync($@"Based on the following Bash history and the new request, generate a helpful suggestion:
 
-        REQUEST:
-        {prompt}
+        REQUEST: {prompt}
 
         BASH HISTORY:
         {string.Join("\n", history)}
