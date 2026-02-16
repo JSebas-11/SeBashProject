@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SeBashProject.src;
 using SeBashProject.src.Common.Enums;
+using SeBashProject.src.Core.Drawing;
 using SeBashProject.src.Core.Execution;
 using SeBashProject.src.Core.History;
 using SeBashProject.src.Core.InputReader;
@@ -33,6 +34,7 @@ class Program {
         historyService.LoadFromExtfile();
 
         while (true) {
+            TerminalWriter.WriteHeader();
             input = reader.ReadLine();
 
             if (string.IsNullOrWhiteSpace(input)) continue;

@@ -27,6 +27,7 @@ internal class GeminiService : IGenerativeService {
         COMMAND: {command}
 
         GUIDELINES:
+        - Do not generate Markdown code, only text to show in a terminal.
         - Break it down by parts (flags, arguments, subcommands).
         - Explain what each part does.
         - Describe what the full command accomplishes.
@@ -40,6 +41,7 @@ internal class GeminiService : IGenerativeService {
         {content}
 
         GUIDELINES:
+        - Do not generate Markdown code, only text to show in a terminal.
         - Summarize its purpose.
         - Explain how it works section by section.
         - Identify potential problems, errors, or security issues.
@@ -51,6 +53,7 @@ internal class GeminiService : IGenerativeService {
         REQUEST: {prompt}
 
         RULES:
+        - Do not generate Markdown code, only text to show in a terminal.
         - The command must be non-destructive (no rm -rf, wipefs, mkfs, dd to disks, etc.).
         - Prefer read-only or harmless commands unless explicitly stated.", "GenerateCommandAsync");
 
@@ -61,6 +64,7 @@ internal class GeminiService : IGenerativeService {
         {content}
         
         GUIDELINES:
+        - Do not generate Markdown code, only text to show in a terminal.
         - Highlight key points.
         - Point out any errors, contradictions, or unclear areas.
         - Identify important causes or consequences mentioned in the text.
@@ -75,6 +79,7 @@ internal class GeminiService : IGenerativeService {
         {string.Join("\n", history)}
 
         GUIDELINES:
+        - Do not generate Markdown code, only text to show in a terminal.
         - Identify patterns or repeated commands.
         - Suggest a useful next command or improvement.
         - Explain why the suggestion is relevant.

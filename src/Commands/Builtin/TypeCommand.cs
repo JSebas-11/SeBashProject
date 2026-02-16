@@ -1,5 +1,6 @@
 using SeBashProject.src.Common;
 using SeBashProject.src.Common.Enums;
+using SeBashProject.src.Core.Drawing;
 using SeBashProject.src.Models;
 using SeBashProject.src.Utilities.Os;
 
@@ -12,17 +13,17 @@ internal class TypeCommand : Command {
     public override async Task<CmdResult> ExecuteAsync(TextReader stdin, TextWriter stdout, TextWriter stderr) {
         foreach (string arg in Args) {
             if (ShellMetadata.IsBuiltin(arg)){
-                await stdout.WriteLineAsync($"{arg} is a shell builtin");
+                await TerminalWriter.WriteLineAsync($"{arg} is a shell builtin", stdout);
                 continue;
             }
             
             string? execPath = OsInteraction.ExecutablePath(arg);
             if (execPath is not null) {
-                await stdout.WriteLineAsync($"{arg} is {execPath}");
+                await TerminalWriter.WriteLineAsync($"{arg} is {execPath}", stdout);
                 continue;
             }
 
-            await stdout.WriteLineAsync($"{arg}: not found");
+            await TerminalWriter.WriteLineAsync($"{arg}: not found", stdout);
         }
         stdout.Close();
         

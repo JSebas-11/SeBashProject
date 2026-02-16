@@ -9,3 +9,5 @@ internal enum RedirectionType { Truncate, Append }
 internal enum CmdResult { Ok, Exit }
 
 internal enum CompletionType { NoMatch, OneMatch, MultipleMatch }
+
+internal enum TerminalStyles { Default, Error, Panel }

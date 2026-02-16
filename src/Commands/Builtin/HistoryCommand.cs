@@ -1,4 +1,5 @@
 using SeBashProject.src.Common.Enums;
+using SeBashProject.src.Core.Drawing;
 using SeBashProject.src.Core.History;
 using SeBashProject.src.Models;
 
@@ -41,7 +42,7 @@ internal sealed class HistoryCommand : Command {
             
             string arg = Args[0];
             if (arg == "-h") {
-                await stdout.WriteLineAsync(_documentation);
+                await TerminalWriter.WriteLineAsync(_documentation, stdout, TerminalStyles.Panel, "Documentation");
                 return CmdResult.Ok;    
             }
             
@@ -70,16 +71,16 @@ internal sealed class HistoryCommand : Command {
 
             // HISTORY WITH ESPECIFIED NUMBER OF LINES
             if (Args.Count > 1) {
-                await stdout.WriteLineAsync("bash: history: too many arguments");
+                await TerminalWriter.WriteLineAsync("bash: history: too many arguments", stderr, TerminalStyles.Error);
                 return CmdResult.Ok;
             }
 
             if (!int.TryParse(arg, out int linesNumber)) {
-                await stdout.WriteLineAsync($"bash: history: {arg}: numeric argument required");
+                await TerminalWriter.WriteLineAsync($"bash: history: {arg}: numeric argument required", stderr, TerminalStyles.Error);
                 return CmdResult.Ok;
             }
             if (linesNumber < 0) {
-                await stdout.WriteLineAsync($"bash: history: {linesNumber}: invalid option");
+                await TerminalWriter.WriteLineAsync($"bash: history: {linesNumber}: invalid option", stderr, TerminalStyles.Error);
                 return CmdResult.Ok;
             }        
             
@@ -97,7 +98,7 @@ internal sealed class HistoryCommand : Command {
 
         foreach (var line in lines) {
             var leftPad = new string(' ', maxLen-startIndex.ToString().Length);
-            await stdout.WriteLineAsync($"{leftPad}{startIndex}  {line}");
+            await TerminalWriter.WriteLineAsync($"{leftPad}{startIndex}  {line}", stdout);
             startIndex++;
         }
     }

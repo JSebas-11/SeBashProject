@@ -1,4 +1,5 @@
 using SeBashProject.src.Common.Enums;
+using SeBashProject.src.Core.Drawing;
 using SeBashProject.src.Models;
 using SeBashProject.src.Utilities.Os;
 
@@ -9,7 +10,7 @@ internal sealed class CdCommand : Command {
 
     public override async Task<CmdResult> ExecuteAsync(TextReader stdin, TextWriter stdout, TextWriter stderr) {
         if (Args.Count > 1) {
-            await stderr.WriteLineAsync($"cd: too many arguments");
+            await TerminalWriter.WriteLineAsync("cd: too many arguments", stderr, TerminalStyles.Error);
             return CmdResult.Ok;
         }
 
@@ -18,7 +19,9 @@ internal sealed class CdCommand : Command {
             : orContent;
 
         if (!PathHandler.ExistsDirectory(path)) {
-            await stderr.WriteLineAsync($"cd: {orContent}: No such file or directory");
+            await TerminalWriter.WriteLineAsync(
+                $"cd: {orContent}: No such file or directory", stderr, TerminalStyles.Error
+            );
             return CmdResult.Ok;
         }
 

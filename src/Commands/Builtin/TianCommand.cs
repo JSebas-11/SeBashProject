@@ -1,4 +1,5 @@
 using SeBashProject.src.Common.Enums;
+using SeBashProject.src.Core.Drawing;
 using SeBashProject.src.Core.History;
 using SeBashProject.src.External.Abstraction;
 using SeBashProject.src.Models;
@@ -8,6 +9,7 @@ namespace SeBashProject.src.Commands.Builtin;
 
 internal sealed class TianCommand : Command {
     // --------------------- INIT ---------------------
+    private bool _error = false;
     private readonly IGenerativeService _genService;
     private readonly HistoryService _historyService;
     private readonly string _documentation = @"
@@ -41,11 +43,11 @@ internal sealed class TianCommand : Command {
         try {
             string output = null!; 
             if (Args.Count == 0) // No parameters/args specified
-                output = _documentation;
+                await TerminalWriter.WriteLineAsync(_documentation, stdout, TerminalStyles.Panel, "Documentation");
             else if (Args.Count == 1)
-                output = $"bash: tian: {Args[0]} requires an argument";
+                await TerminalWriter.WriteLineAsync($"bash: tian: {Args[0]} requires an argument", stderr, TerminalStyles.Error);
             else if (Args.Count > 2)
-                output = "bash: tian: too many arguments";
+                await TerminalWriter.WriteLineAsync("bash: tian: too many arguments", stderr, TerminalStyles.Error);
             else {
                 string arg = Args[0];
                 string value = Args[1];
@@ -55,11 +57,16 @@ internal sealed class TianCommand : Command {
                     "-g" or "--generate" => await _genService.GenerateCommandAsync(value),
                     "-s" or "--summarize" => await HandleExternalFileAsync(value, _genService.SummarizeAsync),
                     "-h" or "--history" => await HandleHistoryAsync(value),
-                    _ => $"bash: tian: {Args[0]} invalid option"
+                    _ => $"bash: tian: {arg} invalid option"
                 };
+
+                if (_error || output == $"bash: tian: {arg} invalid option")
+                    await TerminalWriter.WriteLineAsync(output, stderr, TerminalStyles.Error);
+                else
+                    await TerminalWriter.WriteLineAsync(output, stdout, TerminalStyles.Panel, "Generative AI");
             }
 
-            await stdout.WriteLineAsync(output);
+            _error = false;
             return CmdResult.Ok;
         }
         finally { stdout.Close(); }
@@ -69,13 +76,20 @@ internal sealed class TianCommand : Command {
     private async Task<string> HandleExternalFileAsync(string filePath, Func<string, Task<string>> function) {
         string? contentFile = await OsInteraction.ContentFileAsync(filePath);
 
-        return string.IsNullOrWhiteSpace(contentFile)
-            ? $"bash: tian: {filePath} does not exist or it is empty"
-            : await function.Invoke(contentFile);
+        if (string.IsNullOrWhiteSpace(contentFile)) {
+            _error = true;
+            return $"bash: tian: {filePath} does not exist or it is empty";
+        }
+
+        return await function.Invoke(contentFile);
     }
 
-    private async Task<string> HandleHistoryAsync(string prompt)
-        => _historyService.TotalLines == 0 
-            ? "bash: tian: not context, history is empty"
-            : await _genService.HistoryBasedAsync(_historyService.GetLastNLines(80), prompt);
+    private async Task<string> HandleHistoryAsync(string prompt) {
+        if (_historyService.TotalLines == 0) {
+            _error = true;
+            return "bash: tian: not context, history is empty";
+        }
+
+        return await _genService.HistoryBasedAsync(_historyService.GetLastNLines(80), prompt);
+    }
 }
